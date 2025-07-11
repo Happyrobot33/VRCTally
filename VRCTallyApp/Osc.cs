@@ -68,21 +68,30 @@ namespace ConfigXML
                 .. oscQuery.GetOSCQueryServices(),
             ];
 
-            //we now need to find the specific connection for VRChat
-            foreach (var service in services)
+            try
             {
-                //check if it has the endpoint we need
-                var tree = await Extensions.GetOSCTree(service.address, service.port);
-                if (tree.GetNodeWithPath("/chatbox/input") != null) //this is just a endpoint we know *has* to exist in VRChat
+                //we now need to find the specific connection for VRChat
+                foreach (var service in services)
                 {
-                    //get host info
-                    HostInfo Hostinfo = await Extensions.GetHostInfo(service.address, service.port);
-                    //setup OSC client
-                    string IP = Hostinfo.oscIP;
-                    int port = Hostinfo.oscPort;
-                    oscClient.Connect(IP, port);
-                    return;
+                    //check if it has the endpoint we need
+                    var tree = await Extensions.GetOSCTree(service.address, service.port);
+                    if (tree.GetNodeWithPath("/chatbox/input") != null) //this is just a endpoint we know *has* to exist in VRChat
+                    {
+                        //get host info
+                        HostInfo Hostinfo = await Extensions.GetHostInfo(service.address, service.port);
+                        //setup OSC client
+                        string IP = Hostinfo.oscIP;
+                        int port = Hostinfo.oscPort;
+                        oscClient.Connect(IP, port);
+                        return;
+                    }
                 }
+            }
+            catch (HttpRequestException ex)
+            {
+                //connection refused, connect via static assignment
+                //this SHOULDNT normally happen but does for some reason
+                oscClient.Connect("127.0.0.1", 9000);
             }
         }
 
