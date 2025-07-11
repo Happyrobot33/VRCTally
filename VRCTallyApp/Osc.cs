@@ -45,7 +45,7 @@ namespace ConfigXML
         {
             config.Osc.parameters.Heartbeat.Value = !config.Osc.parameters.Heartbeat.Value;
             await SendOSC(config.Osc.parameters.Heartbeat, BoolToValue(config.Osc.parameters.Heartbeat.Value));
-            
+
             ProgramWindow.InvokeApplicationRefresh();
         }
 
@@ -68,12 +68,12 @@ namespace ConfigXML
                 .. oscQuery.GetOSCQueryServices(),
             ];
 
-            try
+            //we now need to find the specific connection for VRChat
+            foreach (var service in services)
             {
-                //we now need to find the specific connection for VRChat
-                foreach (var service in services)
+                //check if it has the endpoint we need
+                try
                 {
-                    //check if it has the endpoint we need
                     var tree = await Extensions.GetOSCTree(service.address, service.port);
                     if (tree.GetNodeWithPath("/chatbox/input") != null) //this is just a endpoint we know *has* to exist in VRChat
                     {
@@ -86,18 +86,20 @@ namespace ConfigXML
                         return;
                     }
                 }
+                catch (HttpRequestException)
+                {
+                    //do nothing with it
+                }
             }
-            catch (HttpRequestException ex)
-            {
-                //connection refused, connect via static assignment
-                //this SHOULDNT normally happen but does for some reason
-                oscClient.Connect("127.0.0.1", 9000);
-            }
+
+            //if we make it to here, we havent found a valid connection yet. Fall back to default VRChat settings
+            oscClient.Connect("127.0.0.1", 9000);
         }
 
         private async Task SendOSC<T>(ProgramConfig.OscConfig.Parameters.Parameter<T> parameter, params object[] value)
         {
-            try {
+            try
+            {
                 foreach (var addr in parameter.Addresses)
                 {
                     var message = new OscMessage(addr, value);
@@ -123,49 +125,49 @@ namespace ConfigXML
         public FrameView GetWindow(Pos x, Pos y, Dim width, Dim height)
         {
             //setup two subviews, one for OSC and one for VMix
-        FrameView oscView =
-            new("OSC")
+            FrameView oscView =
+                new("OSC")
+                {
+                    X = x,
+                    Y = y,
+                    Width = width,
+                    Height = height,
+                };
+
+            var oscQueryInfo = new Label("Hello, world!") { X = 0, Y = 0, };
+            oscQueryInfo.DrawContent += (e) =>
             {
-                X = x,
-                Y = y,
-                Width = width,
-                Height = height,
+                oscQueryInfo.Text =
+                    $"OSCQuery Service running at TCP {oscQuery.TcpPort} and UDP {oscQuery.TcpPort}";
             };
+            oscView.Add(oscQueryInfo);
 
-        var oscQueryInfo = new Label("Hello, world!") { X = 0, Y = 0, };
-        oscQueryInfo.DrawContent += (e) =>
-        {
-            oscQueryInfo.Text =
-                $"OSCQuery Service running at TCP {oscQuery.TcpPort} and UDP {oscQuery.TcpPort}";
-        };
-        oscView.Add(oscQueryInfo);
-
-        var oscConnectionInfo = new Label("Hello, world!") { Y = Pos.Bottom(oscQueryInfo), };
-        oscConnectionInfo.DrawContent += (e) =>
-        {
-            if (oscClient.Client.Connected)
+            var oscConnectionInfo = new Label("Hello, world!") { Y = Pos.Bottom(oscQueryInfo), };
+            oscConnectionInfo.DrawContent += (e) =>
             {
-                oscConnectionInfo.Text =
-                    $"VRChat OSC Client running at {oscClient.Client.RemoteEndPoint}";
-            }
-            else
-            {
-                oscConnectionInfo.Text = "VRChat OSC Client not connected!";
-            }
-        };
-        oscView.Add(oscConnectionInfo);
+                if (oscClient.Client.Connected)
+                {
+                    oscConnectionInfo.Text =
+                        $"VRChat OSC Client running at {oscClient.Client.RemoteEndPoint}";
+                }
+                else
+                {
+                    oscConnectionInfo.Text = "VRChat OSC Client not connected!";
+                }
+            };
+            oscView.Add(oscConnectionInfo);
 
-        //we want to add a sub view that shows all the parameters
-        oscView.Add(
-            config.Osc.parameters.GetWindow(
-                0,
-                Pos.Bottom(oscConnectionInfo),
-                Dim.Fill(),
-                Dim.Fill()
-            )
-        );
+            //we want to add a sub view that shows all the parameters
+            oscView.Add(
+                config.Osc.parameters.GetWindow(
+                    0,
+                    Pos.Bottom(oscConnectionInfo),
+                    Dim.Fill(),
+                    Dim.Fill()
+                )
+            );
 
-        return oscView;
+            return oscView;
         }
     }
 }
