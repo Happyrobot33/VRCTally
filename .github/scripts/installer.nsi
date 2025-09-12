@@ -35,7 +35,7 @@ WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}"   "UninstallString" "$INSTDIR\Uninstall.exe"
 ;Grab all the files
 File /r "..\..\artifacts\publish\VRCTallyApp\*"
-CreateShortCut "$SMPROGRAMS\${Name}.lnk" "$INSTDIR\HNode.exe"
+CreateShortCut "$SMPROGRAMS\${Name}.lnk" "$INSTDIR\VRCTallyApp.exe"
 SectionEnd
 
 Section "Uninstall"
