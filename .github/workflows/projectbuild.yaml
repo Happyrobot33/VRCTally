@@ -69,21 +69,24 @@ jobs:
         with:
           name: VRCTally ${{ matrix.platform.name }} ${{ matrix.dotnet.name }}
           path: './artifacts/publish/VRCTallyApp/release_${{ matrix.platform.rid }}'
-      
+
       # Get nsis
       - name: Install NSIS
+        if: matrix.platform.name == 'Windows'
         run: |
           sudo apt-get -y update
           sudo apt-get -y install nsis
 
       # run NSIS installer script for windows builds
       - name: NSIS Installer
+        if: matrix.platform.name == 'Windows'
         uses: joncloud/makensis-action@v4.1
         with:
           script-file: .github/scripts/installer.nsi
       
       # Upload installer
       - name: Upload Windows Installer
+        if: matrix.platform.name == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: Windows Installer
