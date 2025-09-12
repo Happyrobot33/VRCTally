@@ -34,7 +34,7 @@ WriteUninstaller "$INSTDIR\Uninstall.exe"
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}"   "DisplayName" "${Name}"
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}"   "UninstallString" "$INSTDIR\Uninstall.exe"
 ;Grab all the files
-File /r "..\..\artifacts\publish\VRCTallyApp\release_*\*"
+File /r "..\..\artifacts\publish\VRCTallyApp\release_win-x64\*"
 CreateShortCut "$SMPROGRAMS\${Name}.lnk" "$INSTDIR\VRCTallyApp.exe"
 SectionEnd
 
