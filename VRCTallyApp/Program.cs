@@ -14,7 +14,7 @@ await Task.Delay(-1);
 
 public class ProgramWindow : Window
 {
-    const string VERSION = "v1.1.1";
+    const string VERSION = "v1.2.0";
     public ProgramWindow()
         : base($"VRCTally - VMix OSC Proxy - {VERSION} - Happyrobot33")
     {
