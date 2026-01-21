@@ -27,7 +27,7 @@ FunctionEnd
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_LANGUAGE "English"
 
-Section
+Section "AppData Setup"
 SetOutPath "$APPDATA\${Name}"
 ;appdata setup
 CreateDirectory "$APPDATA\${Name}"
@@ -35,7 +35,7 @@ CreateDirectory "$APPDATA\${Name}"
 File /oname=config.tally "..\..\artifacts\publish\VRCTallyApp\release_win-x64\config.tally"
 SectionEnd
 
-Section
+Section "Install"
 SetOutPath "$INSTDIR"
 WriteUninstaller "$INSTDIR\Uninstall.exe"
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}"   "DisplayName" "${Name}"
