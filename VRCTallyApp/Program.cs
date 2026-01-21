@@ -277,7 +277,7 @@ public class ProgramWindow : Window
         //parse args to see if we need to use a passed one
         string[] args = Environment.GetCommandLineArgs();
         string configPath = "config.tally";
-        if (args.Length > 0)
+        if (args.Length > 1)
         {
             foreach( var arg in args )
             {
@@ -285,6 +285,10 @@ public class ProgramWindow : Window
                 if (arg.EndsWith(".tally") && File.Exists(arg))
                 {
                     configPath = arg;
+                }
+                else
+                {
+                    Console.WriteLine($"Ignoring invalid config path argument: {arg}");
                 }
             }
         }
