@@ -27,14 +27,6 @@ FunctionEnd
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_LANGUAGE "English"
 
-Section "AppData Setup"
-SetOutPath "$APPDATA\${Name}"
-;appdata setup
-CreateDirectory "$APPDATA\${Name}"
-;copy the config.tally file
-File /oname=config.tally "..\..\artifacts\publish\VRCTallyApp\release_win-x64\config.tally"
-SectionEnd
-
 Section "Install"
 SetOutPath "$INSTDIR"
 WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -44,6 +36,12 @@ WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}
 File /r "..\..\artifacts\publish\VRCTallyApp\release_win-x64\*"
 ;Create the startup command, also passing in the config file location
 CreateShortCut "$SMPROGRAMS\${Name}.lnk" "$INSTDIR\VRCTallyApp.exe" "$APPDATA\${Name}\config.tally"
+
+;appdata setup
+CreateDirectory "$APPDATA\${Name}"
+;copy the config.tally file
+File /oname=config.tally "..\..\artifacts\publish\VRCTallyApp\release_win-x64\config.tally"
+
 SectionEnd
 
 Section "Uninstall"
@@ -52,4 +50,6 @@ Delete "$SMPROGRAMS\${Name}.lnk"
 DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}"
 Delete "$INSTDIR\Uninstall.exe"
 RMDir /r "$INSTDIR"
+
+RMDir /r "$APPDATA\${Name}"
 SectionEnd
