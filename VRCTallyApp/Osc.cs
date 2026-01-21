@@ -180,8 +180,15 @@ public class Osc
         var oscQueryInfo = new Label("Hello, world!") { X = 0, Y = 0, };
         oscQueryInfo.DrawContent += (e) =>
         {
-            oscQueryInfo.Text =
-                $"OSCQuery Service running at TCP {oscQuery.TcpPort} and UDP {oscQuery.TcpPort}";
+            if (config.Osc.UseCustomPort)
+            {
+                oscQueryInfo.Text = $"OSC Query disabled";
+            }
+            else
+            {
+                oscQueryInfo.Text =
+                    $"OSCQuery Service running at TCP {oscQuery.TcpPort} and UDP {oscQuery.TcpPort}";
+            }
         };
         oscView.Add(oscQueryInfo);
 
