@@ -296,7 +296,7 @@ public class ProgramWindow : Window
     {
         //parse args to see if we need to use a passed one
         string[] args = Environment.GetCommandLineArgs();
-        string configPath = GetConfigPath();
+        string configPath = "config.tally"; //assumed default is right next to us in CWD
         if (args.Length > 1)
         {
             foreach (var arg in args)
