@@ -30,6 +30,7 @@ FunctionEnd
 !insertmacro MUI_LANGUAGE "English"
 
 Section "Install"
+SetShellVarContext all
 SetOutPath "$INSTDIR"
 WriteUninstaller "$INSTDIR\Uninstall.exe"
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}"   "DisplayName" "${Name}"
