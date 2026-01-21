@@ -37,9 +37,9 @@ WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}
 ;Grab all the files
 File /r "..\..\artifacts\publish\VRCTallyApp\release_win-x64\*"
 ;Create the startup command, also passing in the config file location
-CreateShortCut "$SMPROGRAMS\${Name}.lnk" "$INSTDIR\VRCTallyApp.exe" "$INSTDIR_DATA\config.tally"
+CreateShortCut "$SMPROGRAMS\${Name}.lnk" "$INSTDIR\VRCTallyApp.exe" "${INSTDIR_DATA}\config.tally"
 
-SetOutPath "$INSTDIR_DATA"
+SetOutPath "${INSTDIR_DATA}"
 ;copy the config.tally file
 File /oname=config.tally "..\..\artifacts\publish\VRCTallyApp\release_win-x64\config.tally"
 
@@ -51,5 +51,5 @@ Delete "$SMPROGRAMS\${Name}.lnk"
 DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}"
 Delete "$INSTDIR\Uninstall.exe"
 RMDir /r "$INSTDIR"
-RMDir /r "$INSTDIR_DATA"
+RMDir /r "${INSTDIR_DATA}"
 SectionEnd
