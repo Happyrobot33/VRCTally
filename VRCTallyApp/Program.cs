@@ -274,7 +274,24 @@ public class ProgramWindow : Window
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
 
-        using (FileStream reader = new FileStream("config.tally", FileMode.Open, FileAccess.Read))
+        //parse args to see if we need to use a passed one
+        string[] args = Environment.GetCommandLineArgs();
+        string configPath = "config.tally";
+        if (args.Length > 0)
+        {
+            foreach( var arg in args )
+            {
+                //attempt to find one that mentions *.tally as a file
+                if (arg.EndsWith(".tally") && File.Exists(arg))
+                {
+                    configPath = arg;
+                }
+            }
+        }
+
+        Console.WriteLine($"Config file should be loaded from: {configPath}");
+
+        using (FileStream reader = new FileStream(configPath, FileMode.Open, FileAccess.Read))
         {
             using (StreamReader sr = new StreamReader(reader, Encoding.UTF8))
             {

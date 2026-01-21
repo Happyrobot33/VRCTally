@@ -30,6 +30,8 @@ namespace ConfigXML
         public class OscConfig
         {
             public required int UpdateRate { get; set; }
+            public required bool UseCustomPort { get; set; }
+            public required int CustomPort { get; set; }
             public required Parameters parameters { get; set; }
 
             public class Parameters
