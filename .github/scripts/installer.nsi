@@ -37,8 +37,7 @@ File /r "..\..\artifacts\publish\VRCTallyApp\release_win-x64\*"
 ;Create the startup command, also passing in the config file location
 CreateShortCut "$SMPROGRAMS\${Name}.lnk" "$INSTDIR\VRCTallyApp.exe" "$APPDATA\${Name}\config.tally"
 
-;appdata setup
-CreateDirectory "$APPDATA\${Name}"
+SetOutPath "$APPDATA\${Name}"
 ;copy the config.tally file
 File /oname=config.tally "..\..\artifacts\publish\VRCTallyApp\release_win-x64\config.tally"
 
