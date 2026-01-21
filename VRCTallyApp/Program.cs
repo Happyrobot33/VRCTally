@@ -255,7 +255,7 @@ public class ProgramWindow : Window
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
         var yaml = serializer.Serialize(config);
-        using (FileStream writer = new FileStream("config.tally", FileMode.Create, FileAccess.Write))
+        using (FileStream writer = new FileStream(GetConfigPath(), FileMode.Create, FileAccess.Write))
         {
             using (StreamWriter sw = new StreamWriter(writer, Encoding.UTF8))
             {
@@ -273,27 +273,8 @@ public class ProgramWindow : Window
         var deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
-
-        //parse args to see if we need to use a passed one
-        string[] args = Environment.GetCommandLineArgs();
-        string configPath = "config.tally";
-        if (args.Length > 1)
-        {
-            foreach( var arg in args )
-            {
-                //attempt to find one that mentions *.tally as a file
-                if (arg.EndsWith(".tally") && File.Exists(arg))
-                {
-                    configPath = arg;
-                }
-                else
-                {
-                    Console.WriteLine($"Ignoring invalid config path argument: {arg}");
-                }
-            }
-        }
-
-        Console.WriteLine($"Config file should be loaded from: {configPath}");
+        
+        string configPath = GetConfigPath();
 
         using (FileStream reader = new FileStream(configPath, FileMode.Open, FileAccess.Read))
         {
@@ -309,5 +290,30 @@ public class ProgramWindow : Window
         }
 
         return config;
+    }
+
+    private static string GetConfigPath()
+    {
+        //parse args to see if we need to use a passed one
+        string[] args = Environment.GetCommandLineArgs();
+        string configPath = GetConfigPath();
+        if (args.Length > 1)
+        {
+            foreach (var arg in args)
+            {
+                //attempt to find one that mentions *.tally as a file
+                if (arg.EndsWith(".tally") && File.Exists(arg))
+                {
+                    configPath = arg;
+                }
+                else
+                {
+                    Console.WriteLine($"Ignoring invalid config path argument: {arg}");
+                }
+            }
+        }
+
+        Console.WriteLine($"Config file should be loaded from: {configPath}");
+        return configPath;
     }
 }

@@ -29,7 +29,7 @@ public class Osc
         if (config.Osc.UseCustomPort)
         {
             //custom port path (not recommended)
-            AddReceiver(IPAddress.Loopback, config.Osc.CustomPort);
+            AddReceiver(IPAddress.Loopback, config.Osc.OscSendPort);
         }
         else
         {

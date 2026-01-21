@@ -15,7 +15,7 @@ osc:
   # Using a custom port is generally not recommended as OSCQuery should just work out of the box with multiple VRChat instances at once
   # For application simplification reasons, these controls are only available at config file level and not in the GUI
   useCustomPort: false
-  customPort: 9000
+  oscSendPort: 9000
   parameters:
     preview:
       parameterStrings:
