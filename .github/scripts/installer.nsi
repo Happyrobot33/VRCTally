@@ -8,16 +8,16 @@ InstallDir "$ProgramFiles\${Name}"
 !include LogicLib.nsh
 !include MUI.nsh
 
-Function .onInit
-SetShellVarContext all
-UserInfo::GetAccountType
-pop $0
-${If} $0 != "admin" ;Require admin rights on NT4+
-    MessageBox mb_iconstop "Administrator rights required!"
-    SetErrorLevel 740 ;ERROR_ELEVATION_REQUIRED
-    Quit
-${EndIf}
-FunctionEnd
+; Function .onInit
+; SetShellVarContext all
+; UserInfo::GetAccountType
+; pop $0
+; ${If} $0 != "admin" ;Require admin rights on NT4+
+;     MessageBox mb_iconstop "Administrator rights required!"
+;     SetErrorLevel 740 ;ERROR_ELEVATION_REQUIRED
+;     Quit
+; ${EndIf}
+; FunctionEnd
 
 !define INSTDIR_DATA "$APPDATA\${Name}"
 
@@ -30,7 +30,6 @@ FunctionEnd
 !insertmacro MUI_LANGUAGE "English"
 
 Section "Install"
-SetShellVarContext all
 SetOutPath "$INSTDIR"
 WriteUninstaller "$INSTDIR\Uninstall.exe"
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DevName}"   "DisplayName" "${Name}"
