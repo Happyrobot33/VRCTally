@@ -11,13 +11,20 @@ Shader "Tally Light Shader"
 		[Toggle]_HeartbeatDetected("Heartbeat Detected", Float) = 0
 		[Toggle]_Error("Error", Float) = 0
 		[Toggle]_Program("Program", Float) = 0
-		_ErrorColor("Error Color", Color) = (1,0,0.7358327,0)
-		_ProgramColor("Program Color", Color) = (1,0,0,0)
-		_PreviewColor("Preview Color", Color) = (0,1,0.09638786,0)
-		_StandbyColor("Standby Color", Color) = (0.006026745,0,1,0)
-		_ShaderError("Shader Error", Color) = (0,0.7945037,1,0)
 		[Toggle]_Preview("Preview", Float) = 0
 		[Toggle]_Standby("Standby", Float) = 0
+		_ErrorColor("Error Color", Color) = (1,0,0.7358327,0)
+		[Toggle]_ErrorColorFlashes("Error Color Flashes", Float) = 1
+		_ProgramColor("Program Color", Color) = (1,0,0,0)
+		[Toggle]_ProgramColorFlashes("Program Color Flashes", Float) = 0
+		_PreviewColor("Preview Color", Color) = (0,1,0.09638786,0)
+		[Toggle]_PreviewColorFlashes("Preview Color Flashes", Float) = 0
+		_StandbyColor("Standby Color", Color) = (0.006026745,0,1,0)
+		[Toggle]_StandbyColorFlashes("Standby Color Flashes", Float) = 0
+		_HeartbeatMissing("Heartbeat Missing", Color) = (1,0.559062,0,0)
+		[Toggle]_HeartbeatMissingFlashes("Heartbeat Missing Flashes", Float) = 1
+		_ShaderError("Shader Error", Color) = (0,0.7945037,1,0)
+		[Toggle]_ShaderErrorFlashes("Shader Error Flashes", Float) = 1
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
 		[HideInInspector] __dirty( "", Int ) = 1
 	}
@@ -44,11 +51,18 @@ Shader "Tally Light Shader"
 		uniform float _Program;
 		uniform float _Preview;
 		uniform float _Standby;
-		uniform float4 _ShaderError;
-		uniform float4 _StandbyColor;
-		uniform float4 _PreviewColor;
-		uniform float4 _ProgramColor;
 		uniform float4 _ErrorColor;
+		uniform float  _ErrorColorFlashes;
+		uniform float4 _ProgramColor;
+		uniform float  _ProgramColorFlashes;
+		uniform float4 _PreviewColor;
+		uniform float  _PreviewColorFlashes;
+		uniform float4 _StandbyColor;
+		uniform float  _StandbyColorFlashes;
+		uniform float4 _HeartbeatMissing;
+		uniform float  _HeartbeatMissingFlashes;
+		uniform float4 _ShaderError;
+		uniform float  _ShaderErrorFlashes;
 		uniform sampler2D _MetallicSmoothness;
 		uniform float4 _MetallicSmoothness_ST;
 		uniform sampler2D _Emission;
@@ -74,15 +88,72 @@ Shader "Tally Light Shader"
 			float mulTime14 = _Time.y * 5.0;
 			float clampResult22 = clamp( sin( mulTime14 ) , 0.0 , 1.0 );
 			float Flash17 = clampResult22;
-			float4 color19 = IsGammaSpace() ? float4(1,0.559062,0,0) : float4(1,0.2728371,0,0);
-			float3 hsvTorgb49 = RGBToHSV( (( _HeartbeatDetected )?( (( _Error )?( ( Flash17 * _ErrorColor ) ):( (( _Program )?( _ProgramColor ):( (( _Preview )?( _PreviewColor ):( (( _Standby )?( _StandbyColor ):( ( Flash17 * _ShaderError ) )) )) )) )) ):( ( Flash17 * color19 ) )).rgb );
-			float4 lerpResult50 = lerp( tex2DNode2 , (( _HeartbeatDetected )?( (( _Error )?( ( Flash17 * _ErrorColor ) ):( (( _Program )?( _ProgramColor ):( (( _Preview )?( _PreviewColor ):( (( _Standby )?( _StandbyColor ):( ( Flash17 * _ShaderError ) )) )) )) )) ):( ( Flash17 * color19 ) )) , hsvTorgb49.z);
+
+			float4 currentColor = (( _HeartbeatDetected )
+				?((
+					( _Error )
+					?((
+						( _ErrorColorFlashes )
+						?
+						(( Flash17 * _ErrorColor ))
+						:
+						( _ErrorColor )
+					))
+					:((
+						( _Program )
+						?((
+							( _ProgramColorFlashes )
+							?
+							(( Flash17 * _ProgramColor ))
+							:
+							( _ProgramColor )
+						))
+						:((
+							( _Preview )
+							?((
+								( _PreviewColorFlashes )
+								?
+								(( Flash17 * _PreviewColor ))
+								:
+								( _PreviewColor )
+							))
+							:((
+								( _Standby )
+								?((
+									( _StandbyColorFlashes )
+									?
+									(( Flash17 * _StandbyColor ))
+									:
+									( _StandbyColor )
+								))
+								:((
+									( _ShaderErrorFlashes )
+									?
+									(( Flash17 * _ShaderError ))
+									:
+									( _ShaderError )
+								))
+							))
+						))
+					))
+				))
+				:((
+					( _HeartbeatMissingFlashes )
+					?
+					(( Flash17 * _HeartbeatMissing ))
+					:
+					( _HeartbeatMissing )
+				))
+			);
+
+			float3 hsvTorgb49 = RGBToHSV( currentColor.rgb );
+			float4 lerpResult50 = lerp( tex2DNode2 , currentColor , hsvTorgb49.z);
 			float2 uv_MetallicSmoothness = i.uv_texcoord * _MetallicSmoothness_ST.xy + _MetallicSmoothness_ST.zw;
 			float4 tex2DNode3 = tex2D( _MetallicSmoothness, uv_MetallicSmoothness );
 			float4 lerpResult44 = lerp( tex2DNode2 , lerpResult50 , tex2DNode3.g);
 			o.Albedo = lerpResult44.rgb;
 			float2 uv_Emission = i.uv_texcoord * _Emission_ST.xy + _Emission_ST.zw;
-			float4 lerpResult43 = lerp( tex2D( _Emission, uv_Emission ) , (( _HeartbeatDetected )?( (( _Error )?( ( Flash17 * _ErrorColor ) ):( (( _Program )?( _ProgramColor ):( (( _Preview )?( _PreviewColor ):( (( _Standby )?( _StandbyColor ):( ( Flash17 * _ShaderError ) )) )) )) )) ):( ( Flash17 * color19 ) )) , tex2DNode3.g);
+			float4 lerpResult43 = lerp( tex2D( _Emission, uv_Emission ) , currentColor , tex2DNode3.g);
 			o.Emission = lerpResult43.rgb;
 			o.Metallic = tex2DNode3.r;
 			o.Smoothness = tex2DNode3.a;
@@ -107,7 +178,7 @@ Node;AmplifyShaderEditor.GetLocalVarNode;23;-496,1088;Inherit;False;17;Flash;1;0
 Node;AmplifyShaderEditor.ToggleSwitchNode;35;-1376,880;Inherit;False;Property;_Preview;Preview;12;0;Create;True;0;0;0;False;0;False;0;True;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;25;-288,1120;Inherit;False;2;2;0;FLOAT;0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.ToggleSwitchNode;31;-736,896;Inherit;False;Property;_Program;Program;6;0;Create;True;0;0;0;False;0;False;0;True;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.ColorNode;19;-160,624;Inherit;False;Constant;_HeartbeatMissing;Heartbeat Missing;6;0;Create;True;0;0;0;False;0;False;1,0.559062,0,0;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.ColorNode;19;-160,624;Inherit;False;Property;_HeartbeatMissing;Heartbeat Missing;6;0;Create;True;0;0;0;False;0;False;1,0.5590620,0,0;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.GetLocalVarNode;21;-143,544;Inherit;False;17;Flash;1;0;OBJECT;;False;1;FLOAT;0
 Node;AmplifyShaderEditor.ToggleSwitchNode;26;-16,896;Inherit;False;Property;_Error;Error;5;0;Create;True;0;0;0;False;0;False;0;True;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;20;121.5907,588;Inherit;False;2;2;0;FLOAT;0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
