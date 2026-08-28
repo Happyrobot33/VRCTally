@@ -76,6 +76,12 @@ public class Vmix
         {
             data = FromXML(await vmixclient.GetStringAsync(""));
         }
+        catch (TimeoutException)
+        {
+            //just use previous data, hopefuly we dont continually timeout
+            config.Osc.parameters.Error.Value = true;
+            return;
+        }
         catch (HttpRequestException)
         {
             //explicitely clear the vmix info
